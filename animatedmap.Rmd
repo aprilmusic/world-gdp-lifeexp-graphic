@@ -1,0 +1,38 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(gapminder)
+library(gganimate)
+library(ggplot2)
+library(png)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE, cache = TRUE}
+gapminder %>%
+  filter(country %in% c("Mexico", "Japan", "Morocco"))
+```
+
+```{r echo = FALSE}
+p <- gapminder %>%
+  mutate(continent = fct_collapse(continent, Asia = c("Asia", "Oceania"))) %>%
+  filter(continent %in% c("Americas", "Africa", "Asia")) %>% 
+  mutate(continent = factor(continent, levels = c("Americas", "Africa", "Asia"))) %>%
+  ggplot(aes(x = gdpPercap, y = lifeExp, size = pop, color = country)) + 
+  scale_colour_manual(values = country_colors) +
+  geom_point(alpha = 0.5) +
+  scale_x_log10(breaks = c(1000, 10000), labels = c("$1,000", "$10,000")) +
+  facet_wrap(~continent) +
+  theme(legend.position="none") +
+  labs(title = 'The World Gets Better Every Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy', caption = 'Source: gapminder package') +
+  transition_time(year) +
+  ease_aes('sine-in-out')
+
+p
+
+```
